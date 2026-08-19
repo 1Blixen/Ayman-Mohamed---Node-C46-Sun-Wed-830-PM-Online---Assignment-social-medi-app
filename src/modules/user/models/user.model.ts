@@ -17,7 +17,9 @@ const userSchema = new Schema<IUser>({
     },
     password : {
         type : String , 
-        required : true , 
+        required : function(this){
+            return this.provider == providerEnum.system
+        } , 
         
     }
     ,

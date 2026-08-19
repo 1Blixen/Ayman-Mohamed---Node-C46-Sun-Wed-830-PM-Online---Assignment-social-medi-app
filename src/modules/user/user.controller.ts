@@ -9,7 +9,10 @@ const router = Router()
 export const routes = {
     base : "/users",
     sendFriendRequest : "/send-friend-request",
-    friendRequestReply : "/friend-request-reply/:id"
+    friendRequestReply : "/friend-request-reply/:id",
+    listFriendRequest : "/list-friend-requests",
+    cancelFriendRequest: "/cancel-friend-request/:id",
+    listFriends : "/list-friends"
 }
 
 
@@ -39,7 +42,52 @@ async (req,res)=>{
 })
 
 
+router.get(
+    routes.listFriendRequest 
+    , auth , 
+    async(req,res)=>{
+        const userId = req.user._id
 
+        const {isTo = true} = req.query
+        const {data} = await userServices.listFriendRequest({userId , isTo:JSON.parse(isTo as string)})
+
+        return successRes({
+            res , 
+            data
+        })
+    }
+)
+
+
+
+router.patch(
+    routes.cancelFriendRequest,
+    validation(userValidation.cancelFriendRequestSchema),
+    auth,
+    async (req,res)=>{
+        const {id} = req.params as userValidation.cancelFriendRequestData
+        const userId = req.user.id
+
+        await userServices.cancelFriendRequest({userId , id })
+
+        return successRes({
+            res
+        })
+    }
+)
+
+
+router.get(
+    routes.listFriends,
+    auth,
+    async(req,res)=>{
+        const user = req.user
+        const userId = req.user._id
+        const {data} = await userServices.listFriends({userId})
+        return successRes({res , data})
+
+    }
+)
 
 
 

@@ -39,3 +39,19 @@ export const friendRequestReplySchema = {
 export type friendRequestReplyData = z.infer<typeof friendRequestReplySchema.body> 
 & z.infer<typeof friendRequestReplySchema.params>
 
+
+
+
+
+export const cancelFriendRequestSchema = {
+    params: z.strictObject({
+        id : z.string().refine((value)=>{
+        return isValidObjectId(value)
+    },
+{
+    error : "invalid ID value"
+})    
+})
+}
+
+export type cancelFriendRequestData =  z.infer <typeof cancelFriendRequestSchema.params>

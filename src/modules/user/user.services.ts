@@ -1,8 +1,9 @@
+import { Types } from "mongoose";
 import { BadRequestException, NotFoundException, UnAuthorizedException } from "../../utils/error.exceptions";
 import { friendRequestModel } from "./models/friendRequest.model";
 import { UserModel } from "./models/user.model";
 import { FriendRequestEnum } from "./types/friendRequest.types";
-import { friendRequestReplyData, sendFriendRequestData } from "./user.validation";
+import { cancelFriendRequestData, friendRequestReplyData, sendFriendRequestData } from "./user.validation";
 
 class UserServices {
 
@@ -62,6 +63,93 @@ async friendRequestReply({id , status , userId} : friendRequestReplyData &{userI
 
 }
 
+
+async listFriendRequest({userId , isTo = true} : {userId : string|Types.ObjectId , isTo?:boolean} ){
+
+    const filter:{
+        to? :string|Types.ObjectId,
+        from?: string|Types.ObjectId,
+        status: FriendRequestEnum
+    } = {
+        to:userId , status : FriendRequestEnum.pending
+    }
+
+    if(!isTo){
+        delete filter.to
+        filter.from = userId
+    }
+    const friendRequests = await friendRequestModel.find(filter)
+
+   
+
+    return {
+        data:{
+            friendRequests
+        }
+    }
+}
+
+
+
+async cancelFriendRequest({userId , id}:{userId:string|Types.ObjectId}&cancelFriendRequestData){
+    const friendRequest = await friendRequestModel.findById(id)
+    if(!friendRequest){
+        throw new NotFoundException("Friend request not found")
+    }
+
+    if(friendRequest.from.toString() != userId.toString()){
+        throw new UnAuthorizedException()
+    }
+
+    if(friendRequest.status != FriendRequestEnum.pending){
+        throw new BadRequestException("the status must be pending")
+    }
+
+    friendRequest.status = FriendRequestEnum.canceled
+
+    await friendRequest.save()
+
+    return{
+        data:{}
+    }
+}
+
+
+async listFriends({userId } : {userId : string|Types.ObjectId}){
+    const friendRequests = await friendRequestModel.find({
+        $or:[{from : userId},
+            {to:userId}
+        ],
+        status:FriendRequestEnum.accepted
+    })
+    .populate([
+        {
+            path:"to" , 
+            select:"email name phone",
+            match:{
+                _id:{
+                    $ne: userId
+                }
+            }
+    }  ,
+{
+            path:"from" , 
+            select:"email name phone",
+            match:{
+                _id:{
+                    $ne: userId
+                }
+            }
+    }  ,])
+
+    const friends = friendRequests.map(req=>{
+        return req.to || req.from
+    })
+    return {
+        data : {friends}
+    }
+    
+}
 
     
 

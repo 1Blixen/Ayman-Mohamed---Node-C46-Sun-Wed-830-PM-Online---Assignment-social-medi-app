@@ -11,8 +11,8 @@ import { createOTP } from './utils/email/otp'
 import { redisClient } from './db/redis.connection'
 import userRouter from "./modules/user/user.controller"
 import { routes as userRoutes } from './modules/user/user.controller'
-
-
+import PostRouter from "./modules/post/post.controller"
+import { routes as postRoutes } from './modules/post/post.controller'
 
 const app = express()
 
@@ -23,6 +23,7 @@ export const bootstrap = async ()=>{
     app.use(morgan("dev"))
     app.use(authRoutes.base , authRouter)
     app.use(userRoutes.base , userRouter)
+    app.use(postRoutes.base , PostRouter)
 
     app.get("/hello" , (req,res)=>{
         throw new NotFoundException('not found')

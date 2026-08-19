@@ -6,7 +6,8 @@ import { HydratedDocument, ObjectId, Types } from "mongoose";
 export enum FriendRequestEnum{
     pending ,
     accepted,
-    rejected 
+    rejected,
+    canceled
 }
 
 

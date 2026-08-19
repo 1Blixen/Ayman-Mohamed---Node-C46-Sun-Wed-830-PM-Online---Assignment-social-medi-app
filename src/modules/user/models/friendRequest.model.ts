@@ -1,5 +1,6 @@
 import { Types , Schema , model } from "mongoose"
 import { FriendRequestEnum, IFriendRequest } from "../types/friendRequest.types"
+import { fr } from "zod/locales"
 
 
 
@@ -16,6 +17,7 @@ const friendRequestSchema = new Schema<IFriendRequest>({
     } ,
     status : {
         type : Number , 
+        // enum:Object.values(FriendRequestEnum),
         default : FriendRequestEnum.pending
     }
 
