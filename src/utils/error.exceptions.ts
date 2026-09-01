@@ -8,7 +8,7 @@ export interface IError extends Error {
 
 abstract class AppErr extends Error implements IError{
     statusCode: number
-    constructor(message: string , options:ErrorOptions , statusCode:number ,public validatioErrors?:z.core.$ZodIssue[]){
+    constructor(message: string , options:ErrorOptions , statusCode:number ,public validationErrors?:z.core.$ZodIssue[]){
         super(message , options)
         this.statusCode = statusCode
     }

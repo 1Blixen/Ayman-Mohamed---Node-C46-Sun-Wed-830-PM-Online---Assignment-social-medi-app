@@ -19,6 +19,12 @@ declare module "express-serve-static-core" {
 }
 
 
+declare module "socket.io"{
+    interface Socket { 
+        user:HUser
+    }
+}
+
 export const auth = async (req:Request , res:Response , next : NextFunction)=>{
     const { authorization } = req.headers
     const {user} = await decodeToken({authorization : authorization as string, tokenType:TokenEnum.access})

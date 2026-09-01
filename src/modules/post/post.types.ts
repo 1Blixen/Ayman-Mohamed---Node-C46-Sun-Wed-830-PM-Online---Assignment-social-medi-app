@@ -12,7 +12,7 @@ export interface IPost{
     title:string ,
     content :string,
     attachments:Array<string>,
-    likes : Array<ObjectId>,
+    likes : Array<Types.ObjectId>,
     privacy: privacyEnum,
     createdBy: Types.ObjectId 
 } 

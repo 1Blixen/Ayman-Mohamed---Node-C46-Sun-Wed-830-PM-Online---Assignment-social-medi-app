@@ -1,9 +1,11 @@
-import { Types } from "mongoose";
+import { ObjectId, Types } from "mongoose";
 import { BadRequestException, NotFoundException, UnAuthorizedException } from "../../utils/error.exceptions";
 import { friendRequestModel } from "./models/friendRequest.model";
 import { UserModel } from "./models/user.model";
 import { FriendRequestEnum } from "./types/friendRequest.types";
 import { cancelFriendRequestData, friendRequestReplyData, sendFriendRequestData } from "./user.validation";
+import { followModel } from "../follow/follow.model";
+import { HUser } from "./types/users.types";
 
 class UserServices {
 
@@ -149,6 +151,34 @@ async listFriends({userId } : {userId : string|Types.ObjectId}){
         data : {friends}
     }
     
+}
+
+
+async getUser({user}:{user:HUser} , targetId:Types.ObjectId|string){
+    const target = await UserModel.findById(targetId)
+
+
+    if(!target){
+        throw new NotFoundException("User not found")
+    }
+
+    const followersCount = await followModel.countDocuments({following:target._id})
+
+    const followingCount = await followModel.countDocuments({follower:target._id})
+
+    const followedByMe = await followModel.findOne({
+        following : target._id,
+        follower:user._id
+    })
+
+    return {
+        data:{
+            target ,
+            followersCount,
+            followingCount,
+            followedByMe
+        }
+    }
 }
 
     

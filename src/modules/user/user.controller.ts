@@ -12,7 +12,8 @@ export const routes = {
     friendRequestReply : "/friend-request-reply/:id",
     listFriendRequest : "/list-friend-requests",
     cancelFriendRequest: "/cancel-friend-request/:id",
-    listFriends : "/list-friends"
+    listFriends : "/list-friends",
+    getUser:"/:targetId"
 }
 
 
@@ -89,6 +90,20 @@ router.get(
     }
 )
 
+
+router.get(routes.getUser , 
+    auth,
+    async (req,res)=>{
+        const targetId = req.params.targetId
+        const user= req.user
+        const {data} = await userServices.getUser({user} , targetId as string)
+
+        return successRes({
+            res ,
+            data
+        })
+    }
+)
 
 
 

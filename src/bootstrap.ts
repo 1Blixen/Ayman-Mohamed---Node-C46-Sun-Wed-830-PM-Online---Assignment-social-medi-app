@@ -13,18 +13,29 @@ import userRouter from "./modules/user/user.controller"
 import { routes as userRoutes } from './modules/user/user.controller'
 import PostRouter from "./modules/post/post.controller"
 import { routes as postRoutes } from './modules/post/post.controller'
+import cors from "cors"
+import io, { Server } from "socket.io"
+import { decodeToken } from './middlewares/auth.middleware'
+import { initializeIo } from './modules/gateway/gateway'
+import followRouter from "./modules/follow/follow.controller"
+import { routes as followRoutes } from './modules/follow/follow.controller'
+import { routes as chatRoutes } from './modules/chat/chat.controller'
+import chatRouter from "./modules/chat/chat.controller"
+
 
 const app = express()
 
 
 export const bootstrap = async ()=>{
 
+    app.use(cors())
     app.use(express.json())
     app.use(morgan("dev"))
     app.use(authRoutes.base , authRouter)
     app.use(userRoutes.base , userRouter)
     app.use(postRoutes.base , PostRouter)
-
+    app.use(followRoutes.base, followRouter)
+    app.use(chatRoutes.base , chatRouter)
     app.get("/hello" , (req,res)=>{
         throw new NotFoundException('not found')
     })
@@ -47,8 +58,13 @@ export const bootstrap = async ()=>{
 
 
 
-    app.listen(process.env.PORT , ()=>{
+    const httpServer = app.listen(process.env.PORT , ()=>{
         console.log(chalk.bgGreen.blue(`Server is running on port ${process.env.PORT}`));
         
     })
+
+    initializeIo(httpServer)
+   
+
+   
 }
